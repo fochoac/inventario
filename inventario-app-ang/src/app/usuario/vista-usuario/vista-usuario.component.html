@@ -1,0 +1,144 @@
+<p-toast></p-toast>
+<h3 class="first">
+  Bienvenid@, {{ usuario.nombreUsuario }},
+  <a (click)="salir()">Cerrar Sesion</a>
+</h3>
+<br />
+<br />
+<p-dataView
+  #dv
+  [value]="productos"
+  [paginator]="true"
+  [rows]="20"
+  paginatorPosition="both"
+
+>
+  <p-header>
+    <div class="ui-helper-clearfix">
+      <div class="ui-g">
+        <div class="ui-g-12 ui-md-12" style="text-align:right">
+          <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+        </div>
+      </div>
+    </div>
+  </p-header>
+  <ng-template let-producto pTemplate="listItem">
+    <div class="ui-g" style="padding: 2em;border-bottom: 1px solid #d9d9d9">
+      <div class="ui-g-12 ui-md-3" style="text-align:center">
+        <img src="assets/images/producto.jpg" style="width: 200px;" />
+      </div>
+      <div class="ui-g-12 ui-md-8 car-details">
+        <div class="ui-g">
+          <div class="ui-g-2 ui-sm-6">Nombre:</div>
+          <div class="ui-g-10 ui-sm-6">
+            <b>{{ producto.nombre }}</b>
+          </div>
+
+          <div class="ui-g-2 ui-sm-6">Marca:</div>
+          <div class="ui-g-10 ui-sm-6">
+            <b>{{ producto.marca }}</b>
+          </div>
+
+          <div class="ui-g-2 ui-sm-6">Descripción:</div>
+          <div class="ui-g-10 ui-sm-6">
+            <b>{{ producto.descripcion }}</b>
+          </div>
+
+          <div class="ui-g-2 ui-sm-6">Precio Unitario:</div>
+          <div class="ui-g-10 ui-sm-6">
+            <b>{{ producto.precioUnitario }}</b>
+          </div>
+          <div class="ui-g-2 ui-sm-6">Unidades en Stock:</div>
+          <div class="ui-g-10 ui-sm-6">
+            <b>{{
+              producto.cantidad == 0 ? "No existe en stock" : producto.cantidad +' unidades'
+            }}</b>
+          </div>
+        </div>
+      </div>
+      <div class="ui-g-12 ui-md-1 search-icon">
+        <button
+          pButton
+          type="button"
+          icon="fa fa-shopping-cart"
+          (click)="seleccionarProducto($event, producto)"
+          [disabled]="producto.cantidad == 0"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template let-producto pTemplate="gridItem">
+    <div style="padding:.5em" class="ui-g-12 ui-md-3">
+      <p-panel [header]="producto.nombre" [style]="{ 'text-align': 'center' }">
+        <img src="assets/images/producto.jpg" width="60" />
+        <div class="car-detail">{{ producto.descripcion -  producto.cantidad == 0 ? "No existe en stock" : producto.cantidad +' unidades'}}</div>
+        <hr class="ui-widget-content" style="border-top:0" />
+        <button
+          pButton
+          type="button"
+          icon="fa fa-shopping-cart"
+          (click)="seleccionarProducto($event, producto)"
+          style="margin-top:0"
+          [disabled]="producto.cantidad == 0"
+        ></button>
+      </p-panel>
+    </div>
+  </ng-template>
+</p-dataView>
+
+<p-dialog
+  header="Comprar Producto"
+  [(visible)]="mostrarDialogo"
+  [responsive]="true"
+  showEffect="fade"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+>
+  <div class="ui-g" *ngIf="productoSeleccionado">
+    <div class="ui-g-12" style="text-align:center">
+      <img src="assets/images/producto.jpg" style="width: 100px" />
+    </div>
+    <div class="ui-g-4">Nombre:</div>
+    <div class="ui-g-8">{{ productoSeleccionado.nombre }}</div>
+
+    <div class="ui-g-4">Descripción:</div>
+    <div class="ui-g-8">{{ productoSeleccionado.descripcion }}</div>
+
+    <div class="ui-g-4">Precio Unitario:</div>
+    <div class="ui-g-8">{{ productoSeleccionado.precioUnitario }}</div>
+
+    <div class="ui-g-4">Unidades Disponibles en Stock:</div>
+    <div class="ui-g-8">{{ productoSeleccionado.cantidad }}</div>
+    <div class="ui-g-4">Unidades A Comprar:</div>
+    <div class="ui-g-8">
+      <input type="text" pInputText [(ngModel)]="venta.cantidad" /><a
+        (click)="calcular()"
+        style="padding-left:10px "
+        >Calcular Total a Pagar</a
+      >
+    </div>
+    <div class="ui-g-4">Total a Pagar:</div>
+    <div class="ui-g-8">$ {{ montoTotal }}</div>
+  </div>
+  <p-footer>
+    <button
+      pButton
+      type="button"
+      icon="fa fa-floppy-o"
+      iconPos="left"
+      label="Guardar"
+      class="ui-button-success"
+      (click)="realizarVenta()"
+      [disabled]="!habilitarBoton()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      icon="fa fa-close"
+      iconPos="left"
+      label="Cancelar"
+      class="ui-button-danger"
+      (click)="cancelar()"
+    ></button>
+  </p-footer>
+</p-dialog>

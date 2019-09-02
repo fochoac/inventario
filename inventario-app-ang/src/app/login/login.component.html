@@ -1,0 +1,48 @@
+<div class="padre">
+  <div class="hijo">
+    <div class="p-grid p-dir-col ">
+      <div class="p-col">
+        <p-card header="Login" [style]="{ width: '360px' }">
+          <br />
+          <div class="p-grid p-dir-col">
+            <label>* Usuario:</label>
+            <input
+              id="float-input"
+              type="text"
+              size="30"
+              pInputText
+              [(ngModel)]="usuario"
+            />
+            <br>
+            <label>* Clave:</label>
+            <input
+              id="float-input"
+              type="password"
+              pPassword
+              size="30"
+              [(ngModel)]="clave"
+            />
+          </div>
+          <br />
+          <br />
+          <br />
+          <br />
+          <div><b>Credenciales:</b></div>
+          <div><b>Administrador:</b> User: admin Clave: admin123</div>
+          <div><b>Usuario Estandar:</b>: User: user Clave: user123</div>
+          <br />
+          <div style="text-align: center">
+            <button
+              pButton
+              type="button"
+              label="Ingresar"
+              (click)="ingresar()"
+              icon="fa fa-sign-in"
+            ></button>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+</div>
+<p-toast></p-toast>

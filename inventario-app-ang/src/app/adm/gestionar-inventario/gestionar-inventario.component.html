@@ -1,0 +1,291 @@
+<p-toast></p-toast>
+<h3 class="first">
+  Bienvenid@, {{ usuario.nombreUsuario }},
+  <a (click)="salir()">Cerrar Sesion</a>
+</h3>
+
+<p-tabView>
+  <p-tabPanel header="Datos Establecimiento" leftIcon="pi pi-home">
+    <div class="p-grid p-dir-col">
+      <div class="p-col">
+        <label>Nombre:</label>
+      </div>
+      <div class="p-col">
+        <label>{{ establecimiento.nombre }}</label>
+      </div>
+      <div class="p-col"><label>RUC:</label></div>
+      <div class="p-col">
+        <label>{{ establecimiento.ruc }}</label>
+      </div>
+    </div>
+  </p-tabPanel>
+  <p-tabPanel header="Agregar Productos" leftIcon="pi pi-box">
+    <p-fieldset legend="Seleccione:">
+      <div class="p-grid p-dir-col">
+        <div class="p-col">
+          Sucursal:
+        </div>
+        <div class="p-col">
+          <p-dropdown
+            [options]="sucursales"
+            [(ngModel)]="sucursalSeleccionada"
+            optionLabel="nombre"
+            placeholder="Seleccione"
+            (onChange)="cargarBodegasAdministracion()"
+          ></p-dropdown>
+        </div>
+        <div class="p-col" *ngIf="bodegas">
+          Bodega:
+        </div>
+        <div class="p-col" *ngIf="bodegas">
+          <p-dropdown
+            [options]="bodegas"
+            [(ngModel)]="bodegaSeleccionada"
+            optionLabel="nombre"
+            placeholder="Seleccione"
+            (onChange)="cargarProductosBodegaAdministracion()"
+          ></p-dropdown>
+        </div>
+      </div>
+    </p-fieldset>
+    <br />
+    <br />
+    <p-table
+      [columns]="cols"
+      [value]="productos"
+      [responsive]="true"
+      *ngIf="bodegaSeleccionada"
+    >
+      <ng-template pTemplate="caption">
+        Lista de Productos
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns">
+            {{ col.header }}
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr>
+          <td *ngFor="let col of columns" [ngSwitch]="col.header">
+            <span class="ui-column-title">{{ col.header }}</span>
+            <div *ngSwitchCase="'Acciones'">
+              <button
+                pButton
+                type="button"
+                icon="fa fa-pencil"
+                iconPos="left"
+                (click)="actualizarProducto(rowData)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="fa fa-trash"
+                iconPos="left"
+                (click)="eliminarProducto(rowData)"
+                class="ui-button-danger"
+              ></button>
+            </div>
+            {{ rowData[col.field] }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <p-confirmDialog [style]="{ width: '50vw' }"></p-confirmDialog>
+    <div style="text-align: right; padding: 10px;" *ngIf="bodegaSeleccionada">
+      <button
+        pButton
+        type="button"
+        icon="fa fa-plus"
+        iconPos="left"
+        label="Crear Producto"
+        (click)="crearProducto()"
+      ></button>
+    </div>
+    <p-dialog
+      header="Crear Producto"
+      [(visible)]="mostrarDialogo"
+      [style]="{ width: '750px', height: '300px' }"
+    >
+      <div class="p-grid ">
+        <div class="p-dir-col p-col-6">
+          <div class="p-col">* Código:</div>
+          <div class="p-col">
+            <input type="text" pInputText [(ngModel)]="productoNuevo.codigo" />
+            <p-message
+              *ngIf="!productoNuevo.codigo"
+              severity="error"
+              text="Campo Obligatorio"
+            ></p-message>
+          </div>
+          <div class="p-col">* Marca:</div>
+          <div class="p-col">
+            <input type="text" pInputText [(ngModel)]="productoNuevo.marca" />
+            <p-message
+              *ngIf="!productoNuevo.marca"
+              severity="error"
+              text="Campo Obligatorio"
+            ></p-message>
+          </div>
+          <div class="p-col">* Nombre:</div>
+          <div class="p-col">
+            <input type="text" pInputText [(ngModel)]="productoNuevo.nombre" />
+            <p-message
+              *ngIf="!productoNuevo.nombre"
+              severity="error"
+              text="Campo Obligatorio"
+            ></p-message>
+          </div>
+          <div class="p-col">Descripción:</div>
+          <div class="p-col">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="productoNuevo.descripcion"
+            />
+          </div>
+        </div>
+        <div class="p-dir-col p-col-6">
+          <div class="p-col">* Cantidad:</div>
+          <div class="p-col">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="productoNuevo.cantidad"
+            />
+            <p-message
+              *ngIf="!productoNuevo.cantidad"
+              severity="error"
+              text="Campo Obligatorio"
+            ></p-message>
+          </div>
+          <div class="p-col">* Costo Unitario</div>
+          <div class="p-col">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="productoNuevo.precioUnitario"
+            />
+            <p-message
+              *ngIf="!productoNuevo.precioUnitario"
+              severity="error"
+              text="Campo Obligatorio"
+            ></p-message>
+          </div>
+          <div class="p-col">*Tipo Producto:</div>
+          <div class="p-col">
+            <p-dropdown
+              [options]="catalogosTipo"
+              [(ngModel)]="catalogoSeleccionado"
+              optionLabel="descripcion"
+              placeholder="Seleccione"
+            >
+            </p-dropdown>
+            <p-message
+              *ngIf="!catalogoSeleccionado"
+              severity="error"
+              text="Campo Obligatorio"
+            ></p-message>
+          </div>
+          <div class="p-col">URL Imagen:</div>
+          <div class="p-col">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="productoNuevo.imagenUrl"
+            />
+          </div>
+        </div>
+      </div>
+      <p-footer>
+        <button
+          pButton
+          type="button"
+          icon="fa fa-floppy-o"
+          iconPos="left"
+          label="Guardar"
+          class="ui-button-success"
+          (click)="guardarProducto()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          icon="fa fa-close"
+          iconPos="left"
+          label="Cancelar"
+          class="ui-button-danger"
+          (click)="cancelar()"
+        ></button>
+      </p-footer>
+    </p-dialog>
+  </p-tabPanel>
+  <p-tabPanel header="Reporte" leftIcon="fa fa-calendar">
+    <p-fieldset legend="Seleccione:">
+      <div class="p-grid p-dir-col">
+        <div class="p-col">
+          Sucursal:
+        </div>
+        <div class="p-col">
+          <p-dropdown
+            [options]="sucursales"
+            [(ngModel)]="sucursalSeleccionadaReporte"
+            optionLabel="nombre"
+            placeholder="Seleccione"
+            (onChange)="cargarBodegasReporte()"
+          ></p-dropdown>
+        </div>
+        <div class="p-col" *ngIf="sucursalSeleccionadaReporte">
+          Bodega:
+        </div>
+        <div class="p-col" *ngIf="sucursalSeleccionadaReporte">
+          <p-dropdown
+            [options]="bodegasReporte"
+            [(ngModel)]="bodegaSeleccionadaReporte"
+            optionLabel="nombre"
+            placeholder="Seleccione"
+            (onChange)="cargarProductosBodegaReporte()"
+          ></p-dropdown>
+        </div>
+      </div>
+    </p-fieldset>
+    <br />
+    <br />
+    <p-table
+      [columns]="columnasReporte"
+      [value]="registroReporte"
+      [responsive]="true"
+      *ngIf="bodegaSeleccionadaReporte"
+    >
+      <ng-template pTemplate="caption">
+        Costo Inventario
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns">
+            {{ col.header }}
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr>
+          <td *ngFor="let col of columns">
+            <span class="ui-column-title">{{ col.header }}</span>
+
+            {{ rowData[col.field] }}
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer" let-columns>
+        <tr>
+          <td colspan="4" style="text-align: right; font-weight: bold">
+            Costo Total Inventario
+          </td>
+          <td>
+            {{ costoInventario }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-tabPanel>
+</p-tabView>

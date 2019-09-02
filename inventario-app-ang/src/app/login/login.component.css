@@ -1,0 +1,13 @@
+.padre {
+
+  height: auto;
+  /*IMPORTANTE*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hijo {
+
+  width: 350px;
+}
